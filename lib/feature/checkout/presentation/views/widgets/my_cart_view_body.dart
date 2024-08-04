@@ -4,6 +4,7 @@ import 'package:payment_gateway/feature/checkout/presentation/views/payment_deta
 import 'package:payment_gateway/feature/checkout/presentation/views/widgets/PaymentMethodListView.dart';
 
 import '../../../../../core/utils/styles.dart';
+import '../thank_you_view.dart';
 import 'cart_info_item.dart';
 import 'cart_total_price.dart';
 import 'custom_bottom.dart';
@@ -60,7 +61,11 @@ class PaymentMethodBottomShet extends StatelessWidget {
           SizedBox(height: 16,),
           PaymentMethodListView(),
           SizedBox(height: 32,),
-          CustomButton(text: "Continue"),
+          CustomButton(text: "Continue",onTap: (){
+            Navigator.push(context,  MaterialPageRoute(builder:  (context) {
+              return ThankYouView();
+            },));
+          },),
         ],
       ),
     );
