@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:payment_gateway/core/utils/api_key.dart';
+import 'package:payment_gateway/feature/checkout/data/models/ephemeral_key_model/EphemeralKeyModel.dart';
 
 import '../../feature/checkout/data/models/Payment_intet_model.dart';
+import '../../feature/checkout/data/models/ephemeral_key_model/init_Payment_Sheet_Input_Model.dart';
 import '../../feature/checkout/data/models/payment_intent_input_model/payment_intent_input_model.dart';
 import 'api_service.dart';
 
@@ -31,12 +33,14 @@ class StripeService {
 
 
 // init payment sheet(paymentIntentClientSecret)
-Future initPaymentSheet({required String paymentIntentClientSecret})async{
+Future initPaymentSheet({required InitPaymentSheetInputModel initPaymentSheetInputModel})async{
     await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
-      paymentIntentClientSecret: paymentIntentClientSecret,
+      paymentIntentClientSecret: initPaymentSheetInputModel.clientSecret,
       merchantDisplayName: "Ehab",
-    ));
+          customerEphemeralKeySecret:initPaymentSheetInputModel.ephemeralKey,
+          customerId:initPaymentSheetInputModel.customerId,
+        ));
 }
 
 
@@ -48,10 +52,40 @@ Future displayPaymentSheet()async{
 Future makePayment(
     {required PaymentIntentInputModel paymentIntentInputModel})async{
     var paymentIntentModel=await createPaymentIntent(paymentIntentInputModel);
+    var ephemeralKeyModel=await createEphemeralKey( customerId:paymentIntentInputModel.customerId );
+
+    var initPaymentSheetInputModel=InitPaymentSheetInputModel(clientSecret: paymentIntentModel.clientSecret!,customerId:paymentIntentInputModel.customerId,ephemeralKey:ephemeralKeyModel.secret!);
     await initPaymentSheet(
-        paymentIntentClientSecret:paymentIntentModel.clientSecret! );
+        initPaymentSheetInputModel: initPaymentSheetInputModel );
     await displayPaymentSheet();
 }
+
+
+
+//da al req ale by3ml al EphemeralKeyModel le m7tago fe initPaymentSheet
+  Future<EphemeralKeyModel> createEphemeralKey({ required
+   String customerId}) async {
+    var response = await apiService.post(
+      body:  {
+        'customer':customerId,
+      },
+
+      contentType: Headers.formUrlEncodedContentType,
+      url: 'https://api.stripe.com/v1/ephemeral_keys',
+      token: ApiKeys.secretKey ,
+      headers: {
+        'Authorization': "Bearer ${ApiKeys.secretKey}",
+        'Stripe-Version':'2024-06-20',
+      }
+    );
+
+    var ephemeralKeyModel = EphemeralKeyModel.fromJson(response.data);
+
+    return ephemeralKeyModel ;
+  }
+
+
+
 }
 
 
