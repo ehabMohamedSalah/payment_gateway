@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:provider/provider.dart';
 
 import 'core/utils/api_key.dart';
+import 'feature/checkout/presentation/provider.dart';
 import 'feature/checkout/presentation/views/my_cart_view.dart';
 
 void main() {
   Stripe.publishableKey=ApiKeys.publishableKey;
-  runApp(const CheckoutApp());
+  runApp(ChangeNotifierProvider(
+    create:  (context) => SettingProvider() ,
+      child: const CheckoutApp()));
 }
  class CheckoutApp extends StatelessWidget {
    const CheckoutApp({super.key});

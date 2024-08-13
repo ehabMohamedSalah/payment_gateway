@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:payment_gateway/feature/checkout/presentation/views/widgets/payment_method_item.dart';
+import 'package:provider/provider.dart';
+
+import '../../provider.dart';
 
 class PaymentMethodListView extends StatefulWidget {
   const PaymentMethodListView({super.key});
@@ -18,6 +21,8 @@ class _PaymentMethodListViewState extends State<PaymentMethodListView> {
 
   @override
   Widget build(BuildContext context) {
+    SettingProvider provider=Provider.of<SettingProvider>(context);
+
     return SizedBox(
       height: 62,
       child: ListView.builder(
@@ -27,12 +32,13 @@ class _PaymentMethodListViewState extends State<PaymentMethodListView> {
             padding: const EdgeInsets.all(8.0),
             child: GestureDetector(
                 onTap: (){
-                  activeIndex=index;
+                  //activeIndex=index;
+                  provider.changeIndex(index);
                   setState(() {
 
                   });
                 },
-                child: PaymentMethodItem(isActive: activeIndex==index,image:paymemtMthodItemss[index] ,)),
+                child: PaymentMethodItem(isActive: provider.index==index,image:paymemtMthodItemss[index] ,)),
           );},
         scrollDirection: Axis.horizontal,
 
